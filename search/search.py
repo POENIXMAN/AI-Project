@@ -87,6 +87,39 @@ def depthFirstSearch(problem: SearchProblem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
+    
+     # Stack to keep track of the current path being explored
+    stack = util.Stack()
+
+    # Set to keep track of visited states
+    visited = set()
+
+    # Start state
+    start_state = problem.getStartState()
+
+    # Add the start state to the stack with an empty path and mark it as visited
+    stack.push((start_state, []))
+    visited.add(start_state)
+
+    while not stack.isEmpty():
+        # Get the next state and path to explore
+        state, path = stack.pop()
+
+        # Check if this state is the goal state
+        if problem.isGoalState(state):
+            return path
+
+        # Get the successors of the current state and add them to the stack if they haven't been visited yet
+        for successor, action, cost in problem.getSuccessors(state):
+            if successor not in visited:
+                visited.add(successor)
+                new_path = path + [action]
+                stack.push((successor, new_path))
+
+    # If no solution is found, return an empty list
+    return []
+     
+     
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem: SearchProblem):
