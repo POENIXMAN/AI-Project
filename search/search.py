@@ -87,35 +87,31 @@ def depthFirstSearch(problem: SearchProblem):
     # print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     
     # Stack to keep track of the current path being explored
-    stack = util.Stack()
+    frontier = util.Stack()
+    visited = []
 
-    # Set to keep track of visited states
-    visited = set()
+    #push the starting node into stack
+    frontier.push((problem.getStartState(),[],0))
+    
+    #pop the node out
+    (state,actionTo,costTo) = frontier.pop()
+    
+    #add the node to visited list
+    visited.append(state)
 
-    # Start state
-    start_state = problem.getStartState()
+    while not problem.isGoalState(state): #while the node is not the goal
+        successors = problem.getSuccessors(state) #get all of the node's successors (state-tuple, action, cost)
+        for successor in successors:
+            if not successor[0] in visited: # if the successor state (x,y) has not been visited,push it into stack
+                frontier.push((successor[0],actionTo + [successor[1]],costTo + successor[2])) # push node to stack
+                visited.append(successor[0]) # mark node as visited
+                #print(successor[0])
+                #print(actionTo + [successor[1]])
+                #print(costTo + successor[2])
 
-    # Add the start state to the stack with an empty path and mark it as visited
-    stack.push((start_state, []))
-    visited.add(start_state)
+        (state,actionTo,costTo) = frontier.pop()
 
-    while not stack.isEmpty():
-        # Get the next state and path to explore
-        state, path = stack.pop()
-
-        # Check if this state is the goal state
-        if problem.isGoalState(state):
-            return path
-
-        # Get the successors of the current state and add them to the stack if they haven't been visited yet
-        for successor, action, cost in problem.getSuccessors(state):
-            if successor not in visited:
-                visited.add(successor)
-                new_path = path + [action]
-                stack.push((successor, new_path))
-
-    # If no solution is found, return an empty list
-    return []
+    return actionTo # return the list of actions 
      
      
     util.raiseNotDefined()
@@ -123,29 +119,31 @@ def depthFirstSearch(problem: SearchProblem):
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     
-    queue = util.Queue()
-    visited = set()
-    start_state = problem.getStartState()
+    frontier = util.Queue()
+    visited = []
 
-    queue.push((start_state, []))
-    visited.add(start_state)
+    #push the starting node into queue
+    frontier.push((problem.getStartState(),[],0))
+    
+    #pop the node out
+    (state,actionTo,costTo) = frontier.pop()
+    
+    #add the node to visited list
+    visited.append(state)
 
-    while not queue.isEmpty():
+    while not problem.isGoalState(state): #while the node is not the goal
+        successors = problem.getSuccessors(state) #get all of the node's successors (state-tuple, action, cost)
+        for successor in successors:
+            if not successor[0] in visited: # if the successor state (x,y) has not been visited,push it into queue
+                frontier.push((successor[0],actionTo + [successor[1]],costTo + successor[2])) # push node to queue
+                visited.append(successor[0]) # mark node as visited
+                #print(successor[0])
+                #print(actionTo + [successor[1]])
+                #print(costTo + successor[2])
 
-        state, path = queue.pop()
+        (state,actionTo,costTo) = frontier.pop()
 
-        if problem.isGoalState(state):
-            return path
-
-        # Get the successors of the current state and add them to the stack if they haven't been visited yet
-        for successor, action, cost in problem.getSuccessors(state):
-            if successor not in visited:
-                visited.add(successor)
-                new_path = path + [action]
-                queue.push((successor, new_path))
-
-    # If no solution is found, return an empty list
-    return []
+    return actionTo # return the list of actions 
     
     util.raiseNotDefined()
 
