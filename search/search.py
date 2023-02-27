@@ -90,14 +90,14 @@ def depthFirstSearch(problem: SearchProblem):
     stack = util.Stack()
 
     # Set to keep track of visited states
-    visited = set()
+    visited = []
 
     # Start state
     start_state = problem.getStartState()
 
     # Add the start state to the stack with an empty path and mark it as visited
     stack.push((start_state, [],0))
-    visited.add(start_state)
+    visited.append(start_state)
 
     while not stack.isEmpty():
         # Get the next state and path to explore
@@ -110,7 +110,7 @@ def depthFirstSearch(problem: SearchProblem):
         # Get the successors of the current state and add them to the stack if they haven't been visited yet
         for successor, action, toCost in problem.getSuccessors(state):
             if successor not in visited:
-                visited.add(successor)
+                visited.append(successor)
                 new_path = path + [action]
                 stack.push((successor, new_path,cost+toCost))
 
@@ -124,11 +124,11 @@ def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     
     queue = util.Queue()
-    visited = set()
+    visited = []
     start_state = problem.getStartState()
 
     queue.push((start_state, [],0))
-    visited.add(start_state)
+    visited.append(start_state)
 
     while not queue.isEmpty():
 
@@ -138,9 +138,10 @@ def breadthFirstSearch(problem: SearchProblem):
             return path
 
         # Get the successors of the current state and add them to the stack if they haven't been visited yet
+       
         for successor, action, toCost in problem.getSuccessors(state):
             if successor not in visited:
-                visited.add(successor)
+                visited.append(successor)
                 new_path = path + [action]
                 queue.push((successor, new_path,toCost+cost))
 
