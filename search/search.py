@@ -196,14 +196,14 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     queue = util.PriorityQueue()
 
     # Set to keep track of visited states
-    visited = set()
+    visited = []
 
     # Start state
     start_state = problem.getStartState()
 
     # Add the start state to the queue with an empty path, cost and priority, and mark it as visited
     queue.push((start_state, [], 0), 0 + heuristic(start_state, problem))
-    visited.add(start_state)
+    visited.append(start_state)
 
     while not queue.isEmpty():
         # Get the next state, path, cost and priority to explore
@@ -216,7 +216,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
         # Get the successors of the current state and add them to the queue if they haven't been visited yet
         for successor, action, step_cost in problem.getSuccessors(state):
             if successor not in visited:
-                visited.add(successor)
+                visited.append(successor)
                 new_path = path + [action]
                 new_cost = cost + step_cost
                 priority = new_cost + heuristic(successor, problem)
