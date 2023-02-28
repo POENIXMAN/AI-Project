@@ -340,22 +340,30 @@ class CornersProblem(search.SearchProblem):
             # new directions
             dx,dy = Actions.directionToVector(action)
             # new position
-            x_new,y_new = int(x + dx),int(y + dy)
+            nextx,nexty = int(x + dx),int(y + dy)
             # copy the array
+            
+            hitsWall = self.walls[nextx][nexty]
+
             newVisitedCorners = cornersVisited[:]
-            hitsWall = self.walls[x_new][y_new]
+
             if not hitsWall:
-                cornerCount = 0 # count of the corners -> if hit visited or not
-                # check if current corner is visited
-                for corner in self.corners:
-                    if (x_new,y_new) == corner:
+
+                cornerCount = 0 # will count the corners 
+
+                # if the the (x,y) is a corner, the loop will break and corner count will be less than 4, and thus we mark the (x,y) as true
+                # else the counter is 4 and (x,y) is not marked
+                for corner in self.corners:  
+                    if (nextx,nexty) == corner:
                         break
                     cornerCount += 1
 
-                if cornerCount < 4: # is in one corner
-                    newVisitedCorners[cornerCount] = True # update the corner visited list
-                state_new = ((x_new,y_new),newVisitedCorners)
-                successors.append((state_new,action,1)) # add this successor
+                if cornerCount < 4: 
+                    newVisitedCorners[cornerCount] = True # update the corner visited list to true
+                
+                # creating the new successor
+                state_new = ((nextx,nexty),newVisitedCorners)
+                successors.append((state_new,action,1)) 
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
