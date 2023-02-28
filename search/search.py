@@ -75,10 +75,8 @@ def tinyMazeSearch(problem):
 def depthFirstSearch(problem: SearchProblem):
     """
     Search the deepest nodes in the search tree first.
-
     Your search algorithm needs to return a list of actions that reaches the
     goal. Make sure to implement a graph search algorithm.
-
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
     """
@@ -87,31 +85,35 @@ def depthFirstSearch(problem: SearchProblem):
     # print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     
     # Stack to keep track of the current path being explored
-    frontier = util.Stack()
+    stack = util.Stack()
+
+    # Set to keep track of visited states
     visited = []
 
-    #push the starting node into stack
-    frontier.push((problem.getStartState(),[],0))
-    
-    #pop the node out
-    (state,actionTo,costTo) = frontier.pop()
-    
-    #add the node to visited list
-    visited.append(state)
+    # Start state
+    start_state = problem.getStartState()
 
-    while not problem.isGoalState(state): #while the node is not the goal
-        successors = problem.getSuccessors(state) #get all of the node's successors (state-tuple, action, cost)
-        for successor in successors:
-            if not successor[0] in visited: # if the successor state (x,y) has not been visited,push it into stack
-                frontier.push((successor[0],actionTo + [successor[1]],costTo + successor[2])) # push node to stack
-                visited.append(successor[0]) # mark node as visited
-                #print(successor[0])
-                #print(actionTo + [successor[1]])
-                #print(costTo + successor[2])
+    # Add the start state to the stack with an empty path and mark it as visited
+    stack.push((start_state, [],0))
+    visited.append(start_state)
 
-        (state,actionTo,costTo) = frontier.pop()
+    while not stack.isEmpty():
+        # Get the next state and path to explore
+        state, path, cost = stack.pop()
 
-    return actionTo # return the list of actions 
+        # Check if this state is the goal state
+        if problem.isGoalState(state):
+            return path
+
+        # Get the successors of the current state and add them to the stack if they haven't been visited yet
+        for successor, action, toCost in problem.getSuccessors(state):
+            if successor not in visited:
+                visited.append(successor)
+                new_path = path + [action]
+                stack.push((successor, new_path,cost+toCost))
+
+    # If no solution is found, return an empty list
+    return []
      
      
     util.raiseNotDefined()
@@ -119,31 +121,30 @@ def depthFirstSearch(problem: SearchProblem):
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     
-    frontier = util.Queue()
+    queue = util.Queue()
     visited = []
+    start_state = problem.getStartState()
 
-    #push the starting node into queue
-    frontier.push((problem.getStartState(),[],0))
-    
-    #pop the node out
-    (state,actionTo,costTo) = frontier.pop()
-    
-    #add the node to visited list
-    visited.append(state)
+    queue.push((start_state, [],0))
+    visited.append(start_state)
 
-    while not problem.isGoalState(state): #while the node is not the goal
-        successors = problem.getSuccessors(state) #get all of the node's successors (state-tuple, action, cost)
-        for successor in successors:
-            if not successor[0] in visited: # if the successor state (x,y) has not been visited,push it into queue
-                frontier.push((successor[0],actionTo + [successor[1]],costTo + successor[2])) # push node to queue
-                visited.append(successor[0]) # mark node as visited
-                #print(successor[0])
-                #print(actionTo + [successor[1]])
-                #print(costTo + successor[2])
+    while not queue.isEmpty():
 
-        (state,actionTo,costTo) = frontier.pop()
+        state, path, cost = queue.pop()
 
-    return actionTo # return the list of actions 
+        if problem.isGoalState(state):
+            return path
+
+        # Get the successors of the current state and add them to the stack if they haven't been visited yet
+       
+        for successor, action, toCost in problem.getSuccessors(state):
+            if successor not in visited:
+                visited.append(successor)
+                new_path = path + [action]
+                queue.push((successor, new_path,toCost+cost))
+
+    # If no solution is found, return an empty list
+    return []
     
     util.raiseNotDefined()
 
