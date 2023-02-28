@@ -293,7 +293,7 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
 
         # initialized visited corners to flase 
-        self.visitedCorners=[False,False,False,False] 
+        self.visitedCorners=[False for x in range(4)] 
         # define a state as (position,  list of visted corners)
         self.startState=(self.startingPosition,self.visitedCorners)
 
@@ -351,7 +351,8 @@ class CornersProblem(search.SearchProblem):
 
                 cornerCount = 0 # will count the corners 
 
-                # if the the (x,y) is a corner, the loop will break and corner count will be less than 4, and thus we mark the (x,y) as true
+                # if the the (x,y) is a corner, the loop will break 
+                # and corner count will be less than 4, and thus we mark the (x,y) as true
                 # else the counter is 4 and (x,y) is not marked
                 for corner in self.corners:  
                     if (nextx,nexty) == corner:
@@ -399,6 +400,7 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
+    
     return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
