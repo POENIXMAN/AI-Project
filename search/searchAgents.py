@@ -44,7 +44,6 @@ import time
 import search
 import pacman
 
-import numpy as np
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -527,7 +526,10 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    #foodList = np.argwhere(foodGrid == 1)
+    # Note that this heuristic may not always be the most accurate for all grid layouts,
+    # it works really well for this specific problem but that might not be the case for different grid layouts 
+    # since the heuristic does not take into account the walls.
+    
     remainingFood = foodGrid.asList()
     if not remainingFood:
         return 0
