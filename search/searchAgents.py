@@ -415,10 +415,13 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     if not unvisited:
         return 0
 
-    # Compute the Manhattan distance to the closest unvisited corner
+    # Compute the Manhattan distance to the all the unvisited corners
     # First it finds the distance to each corner from the current (x, y)
     distances = [util.manhattanDistance(position, corners[corner]) for corner in unvisited]
 
+    # the heuristic function will be the sum of the two closest corners to the current postion
+    
+    # if there are more than 2 unvisited corners find the least two else return sum
     if len(distances) > 2:
         min1 = min(distances)
         distances.remove(min1)
