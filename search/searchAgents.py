@@ -34,6 +34,7 @@ description for details.
 Good luck and happy searching!
 """
 
+
 from typing import List, Tuple, Any
 from game import Directions
 from game import Agent
@@ -42,6 +43,8 @@ import util
 import time
 import search
 import pacman
+
+import numpy as np
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -428,7 +431,9 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
         min2 = min(distances)
         return min1 + min2
     else:
-        return sum(distances)    
+        return sum(distances)
+    
+    #return min(distances)    
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -522,7 +527,18 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    #foodList = np.argwhere(foodGrid == 1)
+    remainingFood = foodGrid.asList()
+    if not remainingFood:
+        return 0
+
+    # Compute the sum of Manhattan distances from the current position to each remaining food pellet
+    totalDistance = 0
+    for food in remainingFood:
+        totalDistance += util.manhattanDistance(position, food)
+
+    return totalDistance
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
