@@ -419,9 +419,13 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     # First it finds the distance to each corner from the current (x, y)
     distances = [util.manhattanDistance(position, corners[corner]) for corner in unvisited]
 
-    # return min(distances)
-    # return sum(distances)
-    # return max(distances)
+    if len(distances) > 2:
+        min1 = min(distances)
+        distances.remove(min1)
+        min2 = min(distances)
+        return min1 + min2
+    else:
+        return sum(distances)    
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
