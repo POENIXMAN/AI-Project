@@ -529,16 +529,21 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     # Note that this heuristic may not always be the most accurate for all grid layouts,
     # it works really well for this specific problem but that might not be the case for different grid layouts 
     # since the heuristic does not take into account the walls.
+    # The algo computes the sum of Manhattan distances from the current position to all remaining food pellet
     
+    # Represent the remaining food in a list
     remainingFood = foodGrid.asList()
+    # If no remaining food exist return 0
     if not remainingFood:
         return 0
 
-    # Compute the sum of Manhattan distances from the current position to each remaining food pellet
+    
     totalDistance = 0
+    # For every remaining food calculate the Manhattan distance and add it to totalDistance
     for food in remainingFood:
         totalDistance += util.manhattanDistance(position, food)
 
+    # Return totalDistance
     return totalDistance
 
 
