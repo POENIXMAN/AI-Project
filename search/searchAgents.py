@@ -44,6 +44,8 @@ import time
 import search
 import pacman
 
+import math
+
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -576,6 +578,7 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
+        return search.ucs(problem)
         util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -609,9 +612,12 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         The state is Pacman's position. Fill this in with a goal test that will
         complete the problem definition.
         """
-        x,y = state
+        x,y = state     
 
         "*** YOUR CODE HERE ***"
+        if state in self.food.asList():
+            return True
+        return False
         
         util.raiseNotDefined()
 
