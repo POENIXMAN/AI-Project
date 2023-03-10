@@ -296,7 +296,7 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
 
-        # initialized visited corners to flase 
+        # initialized visited corners to false 
         self.visitedCorners=[False for x in range(4)] 
         # define a state as (position,  list of visted corners)
         self.startState=(self.startingPosition,self.visitedCorners)

@@ -79,10 +79,11 @@ def depthFirstSearch(problem: SearchProblem):
     goal. Make sure to implement a graph search algorithm.
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
+    
+    print("Start:", problem.getStartState())
+    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    # print("Start:", problem.getStartState())
-    # print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    # print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     
     # Stack to keep track of the current path being explored
     stack = util.Stack()
@@ -121,6 +122,7 @@ def depthFirstSearch(problem: SearchProblem):
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     
+    # very similar to DFS but using queues instead of stack
     queue = util.Queue()
     visited = []
     start_state = problem.getStartState()
