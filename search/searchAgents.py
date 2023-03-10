@@ -345,10 +345,11 @@ class CornersProblem(search.SearchProblem):
             dx,dy = Actions.directionToVector(action)
             # new position
             nextx,nexty = int(x + dx),int(y + dy)
-            # copy the array
             
+            # check if position hits a wall
             hitsWall = self.walls[nextx][nexty]
 
+            # copy the array
             newVisitedCorners = cornersVisited[:]
 
             if not hitsWall:
@@ -432,9 +433,7 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
         min2 = min(distances)
         return min1 + min2
     else:
-        return sum(distances)
-    
-    #return min(distances)    
+        return sum(distances)    
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -578,6 +577,7 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
+        # use ucs to find the path to the closest dot
         return search.ucs(problem)
         util.raiseNotDefined()
 
@@ -615,6 +615,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state     
 
         "*** YOUR CODE HERE ***"
+        # check if position is the same as a food, i.e check if pacman is eating a dot
         if state in self.food.asList():
             return True
         return False
