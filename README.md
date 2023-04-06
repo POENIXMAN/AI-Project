@@ -5,3 +5,10 @@ This is the same pacman problem that was created at UC Berkley.
 
 Done By : @mmawlawi
           @POENIXMAN
+
+
+---
+
+Questions 1-4: Implementing - DFS, BFS, UCS, A*
+
+---
