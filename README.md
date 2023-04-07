@@ -7,7 +7,7 @@ Done By : @mmawlawi
           @POENIXMAN
 
 ## Phase 1:
-This phase focused on implementing search algorithms such that they help pacman to eat all the 
+This phase focused on implementing search algorithms, such that, they help pacman in eating all the 
 dots in the most optimal way
 
 
@@ -16,7 +16,7 @@ dots in the most optimal way
 
 Implementing - DFS, BFS, UCS, A*
 
-### Question 5:
+### - Question 5:
 
 ### - Question 6:
 
