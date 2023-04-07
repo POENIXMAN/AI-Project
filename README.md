@@ -10,7 +10,7 @@ Done By : @mmawlawi
 This phase focused on implementing search algorithms such that they help pacman to eat all the 
 dots in the most optimal way
 
-***
+
 
 ## Questions 1-4: 
 
