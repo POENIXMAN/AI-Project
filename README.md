@@ -12,8 +12,23 @@ dots in the most optimal way
 
 
 
-### Questions 1-4: 
+### -Questions 1-4: 
 
 Implementing - DFS, BFS, UCS, A*
+
+___
+
+### -Question 5:
+
+___
+
+### -Question 6:
+___
+
+### -Question 7:
+___
+
+### -Question 8:
+
 
 
