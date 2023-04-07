@@ -12,7 +12,7 @@ dots in the most optimal way
 
 
 
-## Questions 1-4: 
+### Questions 1-4: 
 
 Implementing - DFS, BFS, UCS, A*
 
