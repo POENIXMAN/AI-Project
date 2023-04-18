@@ -75,26 +75,25 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-         # Calculate the distance to the nearest food
+         # Define the features of the state
         foodDistances = [manhattanDistance(newPos, food) for food in newFood.asList()]
         minFoodDistance = min(foodDistances) if foodDistances else 0
+        ghostDistances = [manhattanDistance(newPos, ghost.getPosition()) for ghost in newGhostStates]
+        
+        # Give a lower weight to scared ghosts
+        scaredGhostDistances = [distance for i, distance in enumerate(ghostDistances) if newGhostStates[i].scaredTimer > 0]
+        nonScaredGhostDistances = [distance for i, distance in enumerate(ghostDistances) if newGhostStates[i].scaredTimer == 0]
+        if scaredGhostDistances:
+            minScaredGhostDistance = min(scaredGhostDistances)
+            minNonScaredGhostDistance = min(nonScaredGhostDistances) if nonScaredGhostDistances else 0
+            ghostWeight = (minScaredGhostDistance + 2 * minNonScaredGhostDistance) / 3
+        else:
+            ghostWeight = min(nonScaredGhostDistances) if nonScaredGhostDistances else 0
+        
+        # Evaluate the state using the weights
+        evaluation = successorGameState.getScore() + self.foodWeight * minFoodDistance - self.ghostWeight * ghostWeight
 
-        # Calculate the distance to the nearest ghost and check if it is in a scared state
-        ghostDistances = []
-        for i, ghostState in enumerate(newGhostStates):
-            distance = manhattanDistance(newPos, ghostState.getPosition())
-            if newScaredTimes[i] > 0:  # Ghost is scared
-                distance *= -1
-            ghostDistances.append(distance)
-
-        minGhostDistance = min(ghostDistances) if ghostDistances else 0
-
-        # Assign weights to different factors and calculate the final evaluation value
-        foodWeight = 1.0
-        ghostWeight = 2.0
-
-        evaluationValue = successorGameState.getScore() - foodWeight * minFoodDistance + ghostWeight * minGhostDistance
-        return evaluationValue
+        return evaluation
         return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState: GameState):
