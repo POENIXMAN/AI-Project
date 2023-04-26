@@ -15,7 +15,6 @@
 from util import manhattanDistance
 from game import Directions
 import random, util
-
 from game import Agent
 from pacman import GameState
 
@@ -23,19 +22,18 @@ class ReflexAgent(Agent):
     """
     A reflex agent chooses an action at each choice point by examining
     its alternatives via a state evaluation function.
-
+​
     The code below is provided as a guide.  You are welcome to change
     it in any way you see fit, so long as you don't touch our method
     headers.
     """
 
-
     def getAction(self, gameState: GameState):
         """
         You do not need to change this method, but you're welcome to.
-
+​
         getAction chooses among the best options according to the evaluation function.
-
+​
         Just like in the previous project, getAction takes a GameState and returns
         some Directions.X for some X in the set {NORTH, SOUTH, WEST, EAST, STOP}
         """
@@ -55,15 +53,15 @@ class ReflexAgent(Agent):
     def evaluationFunction(self, currentGameState: GameState, action):
         """
         Design a better evaluation function here.
-
+​
         The evaluation function takes in the current and proposed successor
         GameStates (pacman.py) and returns a number, where higher numbers are better.
-
+​
         The code below extracts some useful information from the state, like the
         remaining food (newFood) and Pacman position after moving (newPos).
         newScaredTimes holds the number of moves that each ghost will remain
         scared because of Pacman having eaten a power pellet.
-
+​
         Print out these variables to see what you're getting, then combine them
         to create a masterful evaluation function.
         """
@@ -75,32 +73,33 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-         # Define the features of the state
+         # Calculate the distance to the nearest food
         foodDistances = [manhattanDistance(newPos, food) for food in newFood.asList()]
         minFoodDistance = min(foodDistances) if foodDistances else 0
-        ghostDistances = [manhattanDistance(newPos, ghost.getPosition()) for ghost in newGhostStates]
-        
-        # Give a lower weight to scared ghosts
-        scaredGhostDistances = [distance for i, distance in enumerate(ghostDistances) if newGhostStates[i].scaredTimer > 0]
-        nonScaredGhostDistances = [distance for i, distance in enumerate(ghostDistances) if newGhostStates[i].scaredTimer == 0]
-        if scaredGhostDistances:
-            minScaredGhostDistance = min(scaredGhostDistances)
-            minNonScaredGhostDistance = min(nonScaredGhostDistances) if nonScaredGhostDistances else 0
-            ghostWeight = (minScaredGhostDistance + 2 * minNonScaredGhostDistance) / 3
-        else:
-            ghostWeight = min(nonScaredGhostDistances) if nonScaredGhostDistances else 0
-        
-        # Evaluate the state using the weights
-        evaluation = successorGameState.getScore() + self.foodWeight * minFoodDistance - self.ghostWeight * ghostWeight
 
-        return evaluation
+        # Calculate the distance to the nearest ghost and check if it is in a scared state
+        ghostDistances = []
+        for i, ghostState in enumerate(newGhostStates):
+            distance = manhattanDistance(newPos, ghostState.getPosition())
+            if newScaredTimes[i] > 0:  # Ghost is scared
+                distance *= -1
+            ghostDistances.append(distance)
+
+        minGhostDistance = min(ghostDistances) if ghostDistances else 0
+
+        # Assign weights to different factors and calculate the final evaluation value
+        foodWeight = 1.0
+        ghostWeight = 2.0
+
+        evaluationValue = successorGameState.getScore() - foodWeight * minFoodDistance + ghostWeight * minGhostDistance
+        return evaluationValue
         return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState: GameState):
     """
     This default evaluation function just returns the score of the state.
     The score is the same one displayed in the Pacman GUI.
-
+​
     This evaluation function is meant for use with adversarial search agents
     (not reflex agents).
     """
@@ -111,11 +110,11 @@ class MultiAgentSearchAgent(Agent):
     This class provides some common elements to all of your
     multi-agent searchers.  Any methods defined here will be available
     to the MinimaxPacmanAgent, AlphaBetaPacmanAgent & ExpectimaxPacmanAgent.
-
+​
     You *do not* need to make any changes here, but you can if you want to
     add functionality to all your adversarial search agents.  Please do not
     remove anything, however.
-
+​
     Note: this is an abstract class: one that should not be instantiated.  It's
     only partially specified, and designed to be extended.  Agent (game.py)
     is another abstract class.
@@ -194,7 +193,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         Returns the minimax action using self.depth and self.evaluationFunction
         """
-
+        "*** YOUR CODE HERE ***"
         def alpha_beta(agent, depth, gameState, alpha, beta):
             if gameState.isWin() or gameState.isLose() or depth == self.depth:
                 return self.evaluationFunction(gameState), None
@@ -229,8 +228,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
         _, best_action = alpha_beta(0, 0, gameState, float('-inf'), float('inf'))
         return best_action
-
-
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
       Your expectimax agent (question 4)
@@ -239,7 +236,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     def getAction(self, gameState: GameState):
         """
         Returns the expectimax action using self.depth and self.evaluationFunction
-
+​
         All ghosts should be modeled as choosing uniformly at random from their
         legal moves.
         """
@@ -280,7 +277,7 @@ def betterEvaluationFunction(currentGameState: GameState):
     """
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
-
+​
     DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
@@ -309,11 +306,30 @@ def betterEvaluationFunction(currentGameState: GameState):
     minCapsuleDistance = min(capsuleDistances) if capsuleDistances else 0
 
     # Assign weights to different factors and calculate the final evaluation value
+    # Original Values:
+    # foodWeight = 1.0
+    # ghostWeight = 2.0
+    # capsuleWeight = 3.0
+    # remainingFoodWeight = 10.0
+    # remainingCapsuleWeight = 20.0
+    
+    
     foodWeight = 1.0
     ghostWeight = 2.0
     capsuleWeight = 3.0
     remainingFoodWeight = 10.0
     remainingCapsuleWeight = 20.0
+    
+    ghostThreshold = 3
+    capsuleThreshold = 2
+     
+    # increase weight for ghosts if a ghost is nearby
+    # increase weight for capsules if a ghost is nearby and a capsule is close
+    if min(ghostDistances) < ghostThreshold and minCapsuleDistance < capsuleThreshold:
+        capsuleWeight = 5.0  
+        ghostWeight = 4.0
+    elif min(ghostDistances) < ghostThreshold:
+        ghostWeight = 5.0
 
     evaluationValue = currentGameState.getScore() \
         - foodWeight * minFoodDistance \
