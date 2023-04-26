@@ -34,9 +34,7 @@ The agent class should inherit from `MultiAgentSearchAgent` in the `multiAgents.
 
 You may implement any algorithms and techniques you see fit for your agent. However, keep in mind that the game will be played in real-time, so your agent should be able to make decisions quickly.
 
-## Submission
 
-Submit your agent class implementation in the `multiAgents.py` file. The agent class should be named `YourAgentName` as specified in the `Getting Started` section.
 
 ## Resources
 
