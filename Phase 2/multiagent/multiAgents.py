@@ -288,13 +288,13 @@ def betterEvaluationFunction(currentGameState: GameState):
     capsules = currentGameState.getCapsules()
 
     # Calculate the distance to the nearest food
-    foodDistances = [manhattanDistance(pacmanPosition, foodPos) for foodPos in food.asList()]
+    foodDistances = [manhattanDistance(pacmanPosition, foodPos, currentGameState) for foodPos in food.asList()]
     minFoodDistance = min(foodDistances) if foodDistances else 0
 
     # Calculate the distance to the nearest ghost and check if it is in a scared state
     ghostDistances = []
     for i, ghostState in enumerate(ghostStates):
-        distance = manhattanDistance(pacmanPosition, ghostState.getPosition())
+        distance = manhattanDistance(pacmanPosition, ghostState.getPosition(), currentGameState)
         if scaredTimes[i] > 0:  # Ghost is scared
             distance *= -1
         ghostDistances.append(distance)
@@ -302,7 +302,7 @@ def betterEvaluationFunction(currentGameState: GameState):
     minGhostDistance = min(ghostDistances) if ghostDistances else 0
 
     # Calculate the distance to the nearest capsule
-    capsuleDistances = [manhattanDistance(pacmanPosition, capsule) for capsule in capsules]
+    capsuleDistances = [manhattanDistance(pacmanPosition, capsule, currentGameState) for capsule in capsules]
     minCapsuleDistance = min(capsuleDistances) if capsuleDistances else 0
 
     # Assign weights to different factors and calculate the final evaluation value
@@ -344,3 +344,439 @@ def betterEvaluationFunction(currentGameState: GameState):
 
 # Abbreviation
 better = betterEvaluationFunction
+
+
+# # Code from phase 1 to use mazeDistance
+
+# def mazeDistance(point1 , point2 , gameState: GameState) -> int:
+#     """
+#     Returns the maze distance between any two points, using the search functions
+#     you have already built. The gameState can be any game state -- Pacman's
+#     position in that state is ignored.
+
+#     Example usage: mazeDistance( (2,4), (5,6), gameState)
+
+#     This might be a useful helper function for your ApproximateSearchAgent.
+#     """
+#     x1, y1 = point1
+#     x2, y2 = point2
+#     walls = gameState.getWalls()
+#     assert not walls[x1][y1], 'point1 is a wall: ' + str(point1)
+#     assert not walls[x2][y2], 'point2 is a wall: ' + str(point2)
+#     prob = PositionSearchProblem(gameState, start=point1, goal=point2, warn=False, visualize=False)
+#     return len(search.astar(prob))
+
+    
+# class Actions:
+#     """
+#     A collection of static methods for manipulating move actions.
+#     """
+#     # Directions
+#     _directions = {Directions.NORTH: (0, 1),
+#                    Directions.SOUTH: (0, -1),
+#                    Directions.EAST:  (1, 0),
+#                    Directions.WEST:  (-1, 0),
+#                    Directions.STOP:  (0, 0)}
+
+#     _directionsAsList = _directions.items()
+
+#     TOLERANCE = .001
+
+#     def reverseDirection(action):
+#         if action == Directions.NORTH:
+#             return Directions.SOUTH
+#         if action == Directions.SOUTH:
+#             return Directions.NORTH
+#         if action == Directions.EAST:
+#             return Directions.WEST
+#         if action == Directions.WEST:
+#             return Directions.EAST
+#         return action
+#     reverseDirection = staticmethod(reverseDirection)
+
+#     def vectorToDirection(vector):
+#         dx, dy = vector
+#         if dy > 0:
+#             return Directions.NORTH
+#         if dy < 0:
+#             return Directions.SOUTH
+#         if dx < 0:
+#             return Directions.WEST
+#         if dx > 0:
+#             return Directions.EAST
+#         return Directions.STOP
+#     vectorToDirection = staticmethod(vectorToDirection)
+
+#     def directionToVector(direction, speed = 1.0):
+#         dx, dy =  Actions._directions[direction]
+#         return (dx * speed, dy * speed)
+#     directionToVector = staticmethod(directionToVector)
+
+#     def getPossibleActions(config, walls):
+#         possible = []
+#         x, y = config.pos
+#         x_int, y_int = int(x + 0.5), int(y + 0.5)
+
+#         # In between grid points, all agents must continue straight
+#         if (abs(x - x_int) + abs(y - y_int)  > Actions.TOLERANCE):
+#             return [config.getDirection()]
+
+#         for dir, vec in Actions._directionsAsList:
+#             dx, dy = vec
+#             next_y = y_int + dy
+#             next_x = x_int + dx
+#             if not walls[next_x][next_y]: possible.append(dir)
+
+#         return possible
+
+#     getPossibleActions = staticmethod(getPossibleActions)
+
+#     def getLegalNeighbors(position, walls):
+#         x,y = position
+#         x_int, y_int = int(x + 0.5), int(y + 0.5)
+#         neighbors = []
+#         for dir, vec in Actions._directionsAsList:
+#             dx, dy = vec
+#             next_x = x_int + dx
+#             if next_x < 0 or next_x == walls.width: continue
+#             next_y = y_int + dy
+#             if next_y < 0 or next_y == walls.height: continue
+#             if not walls[next_x][next_y]: neighbors.append((next_x, next_y))
+#         return neighbors
+#     getLegalNeighbors = staticmethod(getLegalNeighbors)
+
+#     def getSuccessor(position, action):
+#         dx, dy = Actions.directionToVector(action)
+#         x, y = position
+#         return (x + dx, y + dy)
+#     getSuccessor = staticmethod(getSuccessor)    
+    
+# # search.py
+# # ---------
+# # Licensing Information:  You are free to use or extend these projects for
+# # educational purposes provided that (1) you do not distribute or publish
+# # solutions, (2) you retain this notice, and (3) you provide clear
+# # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
+# # 
+# # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
+# # The core projects and autograders were primarily created by John DeNero
+# # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
+# # Student side autograding was added by Brad Miller, Nick Hay, and
+# # Pieter Abbeel (pabbeel@cs.berkeley.edu).
+
+
+# """
+# In search.py, you will implement generic search algorithms which are called by
+# Pacman agents (in searchAgents.py).
+# """
+
+# class SearchProblem:
+#     """
+#     This class outlines the structure of a search problem, but doesn't implement
+#     any of the methods (in object-oriented terminology: an abstract class).
+
+#     You do not need to change anything in this class, ever.
+#     """
+
+#     def getStartState(self):
+#         """
+#         Returns the start state for the search problem.
+#         """
+#         util.raiseNotDefined()
+
+#     def isGoalState(self, state):
+#         """
+#           state: Search state
+
+#         Returns True if and only if the state is a valid goal state.
+#         """
+#         util.raiseNotDefined()
+
+#     def getSuccessors(self, state):
+#         """
+#           state: Search state
+
+#         For a given state, this should return a list of triples, (successor,
+#         action, stepCost), where 'successor' is a successor to the current
+#         state, 'action' is the action required to get there, and 'stepCost' is
+#         the incremental cost of expanding to that successor.
+#         """
+#         util.raiseNotDefined()
+
+#     def getCostOfActions(self, actions):
+#         """
+#          actions: A list of actions to take
+
+#         This method returns the total cost of a particular sequence of actions.
+#         The sequence must be composed of legal moves.
+#         """
+#         util.raiseNotDefined()
+
+
+# def tinyMazeSearch(problem):
+#     """
+#     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
+#     sequence of moves will be incorrect, so only use this for tinyMaze.
+#     """
+#     from game import Directions
+#     s = Directions.SOUTH
+#     w = Directions.WEST
+#     return  [s, s, w, s, w, w, s, w]
+
+# def depthFirstSearch(problem: SearchProblem):
+#     """
+#     Search the deepest nodes in the search tree first.
+#     Your search algorithm needs to return a list of actions that reaches the
+#     goal. Make sure to implement a graph search algorithm.
+#     To get started, you might want to try some of these simple commands to
+#     understand the search problem that is being passed in:
+    
+#     print("Start:", problem.getStartState())
+#     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+#     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+#     """
+    
+#     # Stack to keep track of the current path being explored
+#     stack = util.Stack()
+
+#     # Set to keep track of visited states
+#     visited = []
+
+#     # Start state
+#     start_state = problem.getStartState()
+
+#     # Add the start state to the stack with an empty path and mark it as visited
+#     stack.push((start_state, [],0))
+#     visited.append(start_state)
+
+#     while not stack.isEmpty():
+#         # Get the next state and path to explore
+#         state, path, cost = stack.pop()
+
+#         # Check if this state is the goal state
+#         if problem.isGoalState(state):
+#             return path
+
+#         # Get the successors of the current state and add them to the stack if they haven't been visited yet
+#         for successor, action, toCost in problem.getSuccessors(state):
+#             if successor not in visited:
+#                 visited.append(successor)
+#                 new_path = path + [action]
+#                 stack.push((successor, new_path,cost+toCost))
+
+#     # If no solution is found, return an empty list
+#     return []
+     
+     
+#     util.raiseNotDefined()
+
+# def breadthFirstSearch(problem: SearchProblem):
+#     """Search the shallowest nodes in the search tree first."""
+    
+#     # very similar to DFS but using queues instead of stack
+#     queue = util.Queue()
+#     visited = []
+#     start_state = problem.getStartState()
+
+#     queue.push((start_state, [],0))
+#     visited.append(start_state)
+
+#     while not queue.isEmpty():
+
+#         state, path, cost = queue.pop()
+
+#         if problem.isGoalState(state):
+#             return path
+
+#         # Get the successors of the current state and add them to the stack if they haven't been visited yet
+       
+#         for successor, action, toCost in problem.getSuccessors(state):
+#             if successor not in visited:
+#                 visited.append(successor)
+#                 new_path = path + [action]
+#                 queue.push((successor, new_path,toCost+cost))
+
+#     # If no solution is found, return an empty list
+#     return []
+    
+#     util.raiseNotDefined()
+
+# def uniformCostSearch(problem: SearchProblem):
+#     """Search the node of least total cost first."""
+#     "*** YOUR CODE HERE ***"
+    
+#     frontier = util.PriorityQueue()
+    
+#     frontier.push((problem.getStartState(), [], 0), 0)  
+    
+#     explored = set()
+    
+#     while not frontier.isEmpty():
+#     # Get the next node to expand from the frontier
+#         node, actions, cost = frontier.pop()
+
+#         # If the node is the goal state, return the actions taken to reach it
+#         if problem.isGoalState(node):
+#             return actions
+
+#         # Add the node to the explored set
+#         explored.add(node)
+
+#         # Generate the successors of the current node
+#         successors = problem.getSuccessors(node)
+
+#         # Add each successor to the frontier if it hasn't been explored yet
+#         for successor, action, step_cost in successors:
+#             if successor not in explored:
+#                 # Calculate the total cost of the path to the successor
+#                 total_cost = cost + step_cost
+#                 # Add the successor to the frontier with its total cost as priority
+#                 frontier.push((successor, actions + [action], total_cost), total_cost)
+
+#     util.raiseNotDefined()
+
+# def nullHeuristic(state, problem=None):
+#     """
+#     A heuristic function estimates the cost from the current state to the nearest
+#     goal in the provided SearchProblem.  This heuristic is trivial.
+#     """
+#     return 0
+
+# def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
+#     """Search the node that has the lowest combined cost and heuristic first."""
+#     "*** YOUR CODE HERE ***"
+#     # Priority queue to keep track of the current path being explored
+#     queue = util.PriorityQueue()
+
+#     # Set to keep track of visited states
+#     visited = []
+
+#     # Start state
+#     start_state = problem.getStartState()
+
+#     # Add the start state to the queue with an empty path, cost and priority, and mark it as visited
+#     queue.push((start_state, [], 0), 0 + heuristic(start_state, problem))
+#     visited.append(start_state)
+
+#     while not queue.isEmpty():
+#         # Get the next state, path, cost and priority to explore
+#         state, path, cost = queue.pop()
+
+#         # Check if this state is the goal state
+#         if problem.isGoalState(state):
+#             return path
+
+#         # Get the successors of the current state and add them to the queue if they haven't been visited yet
+#         for successor, action, step_cost in problem.getSuccessors(state):
+#             if successor not in visited:
+#                 visited.append(successor)
+#                 new_path = path + [action]
+#                 new_cost = cost + step_cost
+#                 priority = new_cost + heuristic(successor, problem)
+#                 queue.push((successor, new_path, new_cost), priority)
+
+#     # If no solution is found, return an empty list
+#     return []
+    
+#     util.raiseNotDefined()
+# class PositionSearchProblem(SearchProblem):
+#     """
+#     A search problem defines the state space, start state, goal test, successor
+#     function and cost function.  This search problem can be used to find paths
+#     to a particular point on the pacman board.
+
+#     The state space consists of (x,y) positions in a pacman game.
+
+#     Note: this search problem is fully specified; you should NOT change it.
+#     """
+
+#     def __init__(self, gameState, costFn = lambda x: 1, goal=(1,1), start=None, warn=True, visualize=True):
+#         """
+#         Stores the start and goal.
+
+#         gameState: A GameState object (pacman.py)
+#         costFn: A function from a search state (tuple) to a non-negative number
+#         goal: A position in the gameState
+#         """
+#         self.walls = gameState.getWalls()
+#         self.startState = gameState.getPacmanPosition()
+#         if start != None: self.startState = start
+#         self.goal = goal
+#         self.costFn = costFn
+#         self.visualize = visualize
+#         if warn and (gameState.getNumFood() != 1 or not gameState.hasFood(*goal)):
+#             print('Warning: this does not look like a regular search maze')
+
+#         # For display purposes
+#         self._visited, self._visitedlist, self._expanded = {}, [], 0 # DO NOT CHANGE
+
+#     def getStartState(self):
+#         return self.startState
+
+#     def isGoalState(self, state):
+#         isGoal = state == self.goal
+
+#         # For display purposes only
+#         if isGoal and self.visualize:
+#             self._visitedlist.append(state)
+#             import __main__
+#             if '_display' in dir(__main__):
+#                 if 'drawExpandedCells' in dir(__main__._display): #@UndefinedVariable
+#                     __main__._display.drawExpandedCells(self._visitedlist) #@UndefinedVariable
+
+#         return isGoal
+
+#     def getSuccessors(self, state):
+#         """
+#         Returns successor states, the actions they require, and a cost of 1.
+
+#          As noted in search.py:
+#              For a given state, this should return a list of triples,
+#          (successor, action, stepCost), where 'successor' is a
+#          successor to the current state, 'action' is the action
+#          required to get there, and 'stepCost' is the incremental
+#          cost of expanding to that successor
+#         """
+
+#         successors = []
+#         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+#             x,y = state
+#             dx, dy = Actions.directionToVector(action)
+#             nextx, nexty = int(x + dx), int(y + dy)
+#             if not self.walls[nextx][nexty]:
+#                 nextState = (nextx, nexty)
+#                 cost = self.costFn(nextState)
+#                 successors.append( ( nextState, action, cost) )
+
+#         # Bookkeeping for display purposes
+#         self._expanded += 1 # DO NOT CHANGE
+#         if state not in self._visited:
+#             self._visited[state] = True
+#             self._visitedlist.append(state)
+
+#         return successors
+
+#     def getCostOfActions(self, actions):
+#         """
+#         Returns the cost of a particular sequence of actions. If those actions
+#         include an illegal move, return 999999.
+#         """
+#         if actions == None: return 999999
+#         x,y= self.getStartState()
+#         cost = 0
+#         for action in actions:
+#             # Check figure out the next state and see whether its' legal
+#             dx, dy = Actions.directionToVector(action)
+#             x, y = int(x + dx), int(y + dy)
+#             if self.walls[x][y]: return 999999
+#             cost += self.costFn((x,y))
+#         return cost
+    
+
+
+# # Abbreviations
+# bfs = breadthFirstSearch
+# dfs = depthFirstSearch
+# astar = aStarSearch
+# ucs = uniformCostSearch
+    
