@@ -326,7 +326,8 @@ def betterEvaluationFunction(currentGameState: GameState):
     # increase weight for ghosts if a ghost is nearby
     # increase weight for capsules if a ghost is nearby and a capsule is close
     if min(ghostDistances) < ghostThreshold and minCapsuleDistance < capsuleThreshold:
-        capsuleWeight = 5.0  
+        capsuleWeight = 5.0
+        remainingCapsuleWeight = 30.0  
         ghostWeight = 4.0
     elif min(ghostDistances) < ghostThreshold:
         ghostWeight = 5.0
