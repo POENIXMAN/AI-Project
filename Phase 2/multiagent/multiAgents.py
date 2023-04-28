@@ -13,7 +13,6 @@
 
 
 from util import manhattanDistance
-from game import Directions
 import random, util
 from game import Agent
 from pacman import GameState
@@ -296,6 +295,7 @@ def betterEvaluationFunction(currentGameState: GameState):
     We adjust the weights of these factors depending on the game state. Specifically:
     - We increase the weight for ghosts and capsules if a ghost is nearby and a capsule is close.
     - We increase the weight for ghosts if a ghost is nearby and there are no capsules left.
+    - we increase the weight of the capsules and decrease that of the ghost if the nearest capsule is closer than the nearest ghost
 
     We also modify the evaluation function to incentivize the agent to move towards the nearest
     junction when there is no food nearby. This encourages the agent to explore more of the maze
@@ -347,25 +347,32 @@ def betterEvaluationFunction(currentGameState: GameState):
     foodWeight = 4.0
     ghostWeight = 3.0
     capsuleWeight = 5.0
-    junctionWeight = 1.0
-    remainingFoodWeight = 30.0
+    junctionWeight = 2.0
+    remainingFoodWeight = 15.0
     remainingCapsuleWeight = 10.0
     
-    ghostThreshold = 3
-    capsuleThreshold = 3
+    ghostThreshold = 4
+    capsuleThreshold = 4
      
     # increase weight of ghosts if a ghost is nearby
-    # increase weight of capsules if a ghost is nearby and a power pallet is close
-    if min(ghostDistances) < ghostThreshold and minCapsuleDistance < capsuleThreshold:
-        capsuleWeight = 10.0
-        remainingCapsuleWeight = 30.0  
-        ghostWeight = 6.0
-    elif min(ghostDistances) < ghostThreshold:
-        ghostWeight = 7.0
+    # increase weight of capsules if a ghost is nearby and a capsule is close
+    if minGhostDistance < ghostThreshold and minCapsuleDistance < capsuleThreshold:
+        # if the nearest capsule is closer than the nearest ghost increase the weight of the capsules and decrease that of the ghost
+        if minCapsuleDistance < minGhostDistance:
+            capsuleWeight = 12.0
+            remainingCapsuleWeight = 30.0 
+            ghostWeight = 2.0
+        else:     
+            capsuleWeight = 6.0
+            remainingCapsuleWeight = 30.0  
+            ghostWeight = 7.0
+    elif minGhostDistance < ghostThreshold:
+        ghostWeight = 8.0
+        
     
     # increase weight of junction when there is no food nearby       
     if minFoodDistance == 0:
-        junctionWeight = 15.0       
+        junctionWeight = 10.0       
 
     evaluationValue = currentGameState.getScore() \
         - foodWeight * minFoodDistance \
