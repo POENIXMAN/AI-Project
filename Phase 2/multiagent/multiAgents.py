@@ -314,11 +314,11 @@ def betterEvaluationFunction(currentGameState: GameState):
     # remainingCapsuleWeight = 20.0
     
     
-    foodWeight = 1.0
-    ghostWeight = 2.0
-    capsuleWeight = 3.0
-    remainingFoodWeight = 10.0
-    remainingCapsuleWeight = 20.0
+    foodWeight = 10.0
+    ghostWeight = 3.0
+    capsuleWeight = 2.0
+    remainingFoodWeight = 30.0
+    remainingCapsuleWeight = 10.0
     
     ghostThreshold = 3
     capsuleThreshold = 2
@@ -327,10 +327,10 @@ def betterEvaluationFunction(currentGameState: GameState):
     # increase weight for capsules if a ghost is nearby and a capsule is close
     if min(ghostDistances) < ghostThreshold and minCapsuleDistance < capsuleThreshold:
         capsuleWeight = 5.0
-        remainingCapsuleWeight = 30.0  
-        ghostWeight = 4.0
+        remainingCapsuleWeight = 20.0  
+        ghostWeight = 6.0
     elif min(ghostDistances) < ghostThreshold:
-        ghostWeight = 5.0
+        ghostWeight = 7.0
 
     evaluationValue = currentGameState.getScore() \
         - foodWeight * minFoodDistance \
@@ -340,7 +340,7 @@ def betterEvaluationFunction(currentGameState: GameState):
         - remainingCapsuleWeight * len(capsules)
 
     return evaluationValue
-    util.raiseNotDefined()
+    util.raiseNotDefined()    
 
 # Abbreviation
 better = betterEvaluationFunction
