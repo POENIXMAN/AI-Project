@@ -278,7 +278,29 @@ def betterEvaluationFunction(currentGameState: GameState):
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 ​
-    DESCRIPTION: <write something here so we know what you did>
+    DESCRIPTION: 
+    
+    This function evaluates the current state of the game by taking into account several factors,
+    including the distance to the nearest food, the distance to the nearest ghost, the distance to the nearest capsule,
+    the number of remaining food pellets, the number of remaining capsules, and the distance to the nearest junction.
+    
+    In this evaluation function, we consider the following factors:
+    - The current score
+    - The distance to the nearest food pellet
+    - The number of remaining food pellets
+    - The number of remaining capsules
+    - The distance to the nearest ghost (or the nearest scared ghost)
+    - The distance to the nearest capsule
+    - The distance to the nearest junction (if no food is nearby)
+
+    We adjust the weights of these factors depending on the game state. Specifically:
+    - We increase the weight for ghosts and capsules if a ghost is nearby and a capsule is close.
+    - We increase the weight for ghosts if a ghost is nearby and there are no capsules left.
+
+    We also modify the evaluation function to incentivize the agent to move towards the nearest
+    junction when there is no food nearby. This encourages the agent to explore more of the maze
+    and potentially find a closer source of food.
+    
     """
     "*** YOUR CODE HERE ***"
     pacmanPosition = currentGameState.getPacmanPosition()
@@ -286,15 +308,16 @@ def betterEvaluationFunction(currentGameState: GameState):
     ghostStates = currentGameState.getGhostStates()
     scaredTimes = [ghostState.scaredTimer for ghostState in ghostStates]
     capsules = currentGameState.getCapsules()
+    walls = currentGameState.getWalls()
 
     # Calculate the distance to the nearest food
-    foodDistances = [manhattanDistance(pacmanPosition, foodPos, currentGameState) for foodPos in food.asList()]
+    foodDistances = [manhattanDistance(pacmanPosition, foodPos) for foodPos in food.asList()]
     minFoodDistance = min(foodDistances) if foodDistances else 0
 
     # Calculate the distance to the nearest ghost and check if it is in a scared state
     ghostDistances = []
     for i, ghostState in enumerate(ghostStates):
-        distance = manhattanDistance(pacmanPosition, ghostState.getPosition(), currentGameState)
+        distance = manhattanDistance(pacmanPosition, ghostState.getPosition())
         if scaredTimes[i] > 0:  # Ghost is scared
             distance *= -1
         ghostDistances.append(distance)
@@ -302,8 +325,16 @@ def betterEvaluationFunction(currentGameState: GameState):
     minGhostDistance = min(ghostDistances) if ghostDistances else 0
 
     # Calculate the distance to the nearest capsule
-    capsuleDistances = [manhattanDistance(pacmanPosition, capsule, currentGameState) for capsule in capsules]
+    capsuleDistances = [manhattanDistance(pacmanPosition, capsule) for capsule in capsules]
     minCapsuleDistance = min(capsuleDistances) if capsuleDistances else 0
+    
+    # Calculate the distance to the nearest junction
+    junctionDistances = []
+    for x in range(walls.width):
+        for y in range(walls.height):
+            if not walls[x][y]:
+                junctionDistances.append(manhattanDistance(pacmanPosition, (x, y)))
+    minJunctionDistance = min(junctionDistances) if junctionDistances else 0
 
     # Assign weights to different factors and calculate the final evaluation value
     # Original Values:
@@ -313,29 +344,34 @@ def betterEvaluationFunction(currentGameState: GameState):
     # remainingFoodWeight = 10.0
     # remainingCapsuleWeight = 20.0
     
-    
-    foodWeight = 10.0
+    foodWeight = 4.0
     ghostWeight = 3.0
-    capsuleWeight = 2.0
+    capsuleWeight = 5.0
+    junctionWeight = 1.0
     remainingFoodWeight = 30.0
     remainingCapsuleWeight = 10.0
     
     ghostThreshold = 3
-    capsuleThreshold = 2
+    capsuleThreshold = 3
      
-    # increase weight for ghosts if a ghost is nearby
-    # increase weight for capsules if a ghost is nearby and a capsule is close
+    # increase weight of ghosts if a ghost is nearby
+    # increase weight of capsules if a ghost is nearby and a power pallet is close
     if min(ghostDistances) < ghostThreshold and minCapsuleDistance < capsuleThreshold:
-        capsuleWeight = 5.0
-        remainingCapsuleWeight = 20.0  
+        capsuleWeight = 10.0
+        remainingCapsuleWeight = 30.0  
         ghostWeight = 6.0
     elif min(ghostDistances) < ghostThreshold:
         ghostWeight = 7.0
+    
+    # increase weight of junction when there is no food nearby       
+    if minFoodDistance == 0:
+        junctionWeight = 15.0       
 
     evaluationValue = currentGameState.getScore() \
         - foodWeight * minFoodDistance \
         + ghostWeight * minGhostDistance \
         - capsuleWeight * minCapsuleDistance \
+        - junctionWeight * minJunctionDistance \
         - remainingFoodWeight * len(foodDistances) \
         - remainingCapsuleWeight * len(capsules)
 
